@@ -38,9 +38,9 @@ entity Computer is
          switches : in STD_LOGIC_VECTOR(15 downto 0);
          LEDout : out STD_LOGIC_VECTOR(15 downto 0);
          anodeOut : out STD_LOGIC_VECTOR (3 downto 0);
-         cathodeOut : out STD_LOGIC_VECTOR (6 downto 0));
+         cathodeOut : out STD_LOGIC_VECTOR (6 downto 0);
          --debug_controls : in STD_LOGIC_VECTOR(3 downto 0);
-         --debug_out : out STD_LOGIC_VECTOR(15 downto 0) );
+         debug_out : out STD_LOGIC_VECTOR(15 downto 0) );
 end Computer;
 
 architecture Behavioral of Computer is
@@ -146,7 +146,7 @@ architecture Behavioral of Computer is
     signal selectSlave : STD_LOGIC_VECTOR(2 downto 0); --000 : memory, 001 -> Switch, 010 -> LED, 011 -> 7seg
 
     signal debug_controls : STD_LOGIC_VECTOR(3 downto 0);
-    signal debug_out : STD_LOGIC_VECTOR(15 downto 0);
+    --signal debug_out : STD_LOGIC_VECTOR(15 downto 0);
     
     signal switches_temp : STD_LOGIC_VECTOR(15 downto 0);
     
