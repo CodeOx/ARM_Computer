@@ -93,7 +93,7 @@ architecture Behavioral of controller is
     signal predicationResult : STD_LOGIC;
     signal undefined_ins : STD_LOGIC;
     signal undefined_predication : STD_LOGIC;
-    signal undefined_encoding : STD_LOGIC;
+    signal undefined_encoding_temp : STD_LOGIC;
     signal ins_type : STD_LOGIC_VECTOR(1 downto 0);
     signal ins_subtype : STD_LOGIC_VECTOR(2 downto 0);
     signal ins_variant : STD_LOGIC_VECTOR(1 downto 0);
@@ -142,10 +142,10 @@ begin
                 ins_type => ins_type,
                 ins_subtype => ins_subtype,
                 ins_variant => ins_variant,
-                undefined_encoding =>undefined_encoding);
+                undefined_encoding =>undefined_encoding_temp);
                 
                 
-    undefined_ins <= undefined_encoding or undefined_predication;
+    undefined_ins <= undefined_encoding_temp or undefined_predication;
     skip_ins <= undefined_ins; 
     --skip_ins <= '0';
     

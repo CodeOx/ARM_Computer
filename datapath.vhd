@@ -93,13 +93,13 @@ architecture Behavioral of datapath is
     end component;
     
     component instruction_memory_wrapper
-    Port ( addr : in STD_LOGIC_VECTOR ( 31 downto 0 );
-            rst : in STD_LOGIC;
-            clk : in STD_LOGIC;
-            din : in STD_LOGIC_VECTOR ( 31 downto 0 );
-            dout : out STD_LOGIC_VECTOR ( 31 downto 0 );
-            en : in STD_LOGIC;
-            we : in STD_LOGIC_VECTOR(3 downto 0));
+    Port ( BRAM_PORTA_addr : in STD_LOGIC_VECTOR ( 31 downto 0 );
+            BRAM_PORTA_rst : in STD_LOGIC;
+            BRAM_PORTA_clk : in STD_LOGIC;
+            BRAM_PORTA_din : in STD_LOGIC_VECTOR ( 31 downto 0 );
+            BRAM_PORTA_dout : out STD_LOGIC_VECTOR ( 31 downto 0 );
+            BRAM_PORTA_en : in STD_LOGIC;
+            BRAM_PORTA_we : in STD_LOGIC_VECTOR(3 downto 0));
     end component;
     
     signal ins : STD_LOGIC_VECTOR(31 downto 0);
@@ -207,13 +207,13 @@ begin
     MemoryEna <= (memoryReadEnable or memoryWriteEnable);
     
     instruction_memory : instruction_memory_wrapper
-    Port Map (  addr => memoryAddress,
-                clk => clk,
-                rst => reset,
-                din => dataToMemory,
-                dout => dataFromMemory,
-                en => MemoryEna,
-                we => MemoryWea
+    Port Map (  BRAM_PORTA_addr => memoryAddress,
+                BRAM_PORTA_clk => clk,
+                BRAM_PORTA_rst => reset,
+                BRAM_PORTA_din => dataToMemory,
+                BRAM_PORTA_dout => dataFromMemory,
+                BRAM_PORTA_en => MemoryEna,
+                BRAM_PORTA_we => MemoryWea
     );
     shift : shifter
     Port Map ( input => ShifterIn,

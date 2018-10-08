@@ -18,13 +18,13 @@ end MemorySlave;
 architecture Behavioral of MemorySlave is
     component data_memory_wrapper
     Port (
-        addr : in STD_LOGIC_VECTOR(31 downto 0) ;
-        clk : in STD_LOGIC;
-        din : in STD_LOGIC_VECTOR(31 downto 0);
-        dout : out STD_LOGIC_VECTOR(31 downto 0);
-        en : in STD_LOGIC;
-        rst : in STD_LOGIC;
-        we : in STD_LOGIC_VECTOR(3 downto 0)
+        BRAM_PORTA_addr : in STD_LOGIC_VECTOR(31 downto 0) ;
+        BRAM_PORTA_clk : in STD_LOGIC;
+        BRAM_PORTA_din : in STD_LOGIC_VECTOR(31 downto 0);
+        BRAM_PORTA_dout : out STD_LOGIC_VECTOR(31 downto 0);
+        BRAM_PORTA_en : in STD_LOGIC;
+        BRAM_PORTA_rst : in STD_LOGIC;
+        BRAM_PORTA_we : in STD_LOGIC_VECTOR(3 downto 0)
         );
     end component;
     Type State is (
@@ -41,13 +41,13 @@ begin
 
     memory: data_memory_wrapper
         Port Map(  
-            addr => mem_address,
-            clk => HClock,
-            din => HWData,
-            dout => mem_data,
-            en => '1',
-            rst => HReset,
-            we => mem_write_enable
+            BRAM_PORTA_addr => mem_address,
+            BRAM_PORTA_clk => HClock,
+            BRAM_PORTA_din => HWData,
+            BRAM_PORTA_dout => mem_data,
+            BRAM_PORTA_en => '1',
+            BRAM_PORTA_rst => HReset,
+            BRAM_PORTA_we => mem_write_enable
             );
             
     
