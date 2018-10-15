@@ -15,6 +15,7 @@ entity datapath is
         Aenable : in STD_LOGIC;
         Benable : in STD_LOGIC;
         Menable : in STD_LOGIC;
+        SPSRenable : in STD_LOGIC;
         PMPathMode : in STD_LOGIC_VECTOR(2 downto 0);
         PMPathByteOffset : in STD_LOGIC_VECTOR(1 downto 0);
         ALUmode : in STD_LOGIC_VECTOR(3 downto 0);
@@ -146,13 +147,14 @@ architecture Behavioral of datapath is
     signal MemoryWea : STD_LOGIC_VECTOR(3 downto 0);
     signal debug_out1 : STD_LOGIC_VECTOR(31 downto 0);
     signal MemoryEna : STD_LOGIC;
+    signal SPSR : STD_LOGIC_VECTOR(35 downto 0);
 begin
     instruction <= ins;
     flagZ <= Z;
     flagN <= N;
     flagV <= V;
     flagC <= C;
-
+    
     ALUCarry <= carry when Fset='0' else ShifterCarry; 
     
     debug_out <= debug_out1; 
@@ -308,4 +310,10 @@ begin
             C <= ALUc;
         end if;
     end process;
+    process (clk)
+        begin
+            if rising_edge(clk) and SPSRenable = '1' then
+                SPSR <= Z & N & V & C & PC;
+            end if;
+        end process;
 end Behavioral;
