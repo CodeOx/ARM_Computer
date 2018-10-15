@@ -27,25 +27,38 @@ entity UART_LOOPBACK is
         UART_TXD   : out std_logic;
         UART_RXD   : in  std_logic;
         -- DEBUG INTERFACE
-        BUSY       : out std_logic;
-        FRAME_ERR  : out std_logic;
+        --BUSY       : out std_logic;
+        --FRAME_ERR  : out std_logic;
         -- LED
-        DATA_OUT    : out  std_logic_vector(7 downto 0);
-        reset_LED   : out std_logic
+        --DATA_OUT    : out  std_logic_vector(7 downto 0);
+        --reset_LED   : out std_logic;
+        -- Slave
+        Hsel : in STD_LOGIC;
+        Haddress : in STD_LOGIC_VECTOR(15 downto 0);
+        HWrite : in STD_LOGIC;
+        HTrans : in STD_LOGIC_VECTOR(1 downto 0);
+        HWData : in STD_LOGIC_VECTOR(31 downto 0);
+        HRData : out STD_LOGIC_VECTOR(31 downto 0);
+        HReady : out STD_LOGIC
     );
 end UART_LOOPBACK;
 
 architecture FULL of UART_LOOPBACK is
-
-    signal data    : std_logic_vector(7 downto 0);
+    Type State is (
+        IDLE,
+        WRITE_TO_PC,
+        READ_FROM_PC,
+        WRITE_LOOPBACK
+    );
+    signal BUSY : STD_LOGIC;
+    signal FRAME_ERR : STD_LOGIC;
+    signal data_in_temp    : std_logic_vector(7 downto 0);
+    signal data_out_temp    : std_logic_vector(7 downto 0);
+    signal data_send_temp : STD_LOGIC;
     signal valid   : std_logic;
-    signal reset   : std_logic;
+    signal curr_state : State:=IDLE;
 
 begin
-
-	reset <= RST_N;
-    DATA_OUT <= data;
-    reset_LED <= reset;
 	uart_i: entity work.UART
     generic map (
         CLK_FREQ    => CLK_FREQ,
@@ -54,18 +67,45 @@ begin
     )
     port map (
         CLK         => CLK,
-        RST         => reset,
+        RST         => RST_N,
         -- UART INTERFACE
         UART_TXD    => UART_TXD,
         UART_RXD    => UART_RXD,
         -- USER DATA OUTPUT INTERFACE
-        DATA_OUT    => data,
+        DATA_OUT    => data_out_temp,
         DATA_VLD    => valid,
         FRAME_ERROR => FRAME_ERR,
         -- USER DATA INPUT INTERFACE
-        DATA_IN     => data,
-        DATA_SEND   => valid,
+        DATA_IN     => data_in_temp,
+        DATA_SEND   => data_send_temp,
         BUSY        => BUSY
     );
+    
+    process(CLK, RST_N)
+    begin
+        if RST_N = '1' then 
+            curr_state<=IDLE;
+        elsif rising_edge(CLK) then
+            case curr_state is
+                when IDLE =>
+                   if HTrans = "10" and HSel ='1' and BUSY = '0' then
+                       if HWrite = '1' then
+                            curr_state <= WRITE_TO_PC;
+                       else
+                            curr_state <= READ_FROM_PC;
+                       end if;
+                   end if;
+                when READ_FROM_PC=>
+                    curr_state <= WRITE_LOOPBACK;
+                when others => curr_state <= IDLE;
+            end case;
+        end if;
+    end process;    
+    
+    data_send_temp <= '1' when curr_state = WRITE_TO_PC or curr_state = WRITE_LOOPBACK else '0';
+    data_in_temp <= HWData(7 downto 0) when curr_state = WRITE_TO_PC else
+                    data_out_temp;
+    HRData <= "000000000000000000000000" & data_out_temp;
+    HReady <= valid;
 
 end FULL;
