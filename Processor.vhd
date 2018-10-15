@@ -44,6 +44,7 @@ architecture Behavioral of processor is
           Aenable : out STD_LOGIC;
           Benable : out STD_LOGIC;
           Menable : out STD_LOGIC;
+          SPSRenable : out STD_LOGIC;
           PMPathMode : out STD_LOGIC_VECTOR(2 downto 0);
           PMPathByteOffset : out STD_LOGIC_VECTOR(1 downto 0);
           ALUmode : out STD_LOGIC_VECTOR(3 downto 0);
@@ -52,13 +53,14 @@ architecture Behavioral of processor is
           rad1select : out STD_LOGIC_VECTOR(1 downto 0);
           rad2select : out STD_LOGIC;
           wadselect : out STD_LOGIC_VECTOR(1 downto 0);
-          wdselect : out STD_LOGIC;
+          wdselect : out STD_LOGIC_VECTOR(1 downto 0);
           Hwrite : out STD_LOGIC;
           Htrans : out STD_LOGIC_VECTOR(1 downto 0);
           --ShiftType : in STD_LOGIC_VECTOR(1 downto 0);  --read directly from instruction
           ShiftAmountSelect : out STD_LOGIC;
           ShifterInSelect : out STD_LOGIC;
           Fset : out STD_LOGIC;
+          Fselect : out STD_LOGIC;
           --output to controller :
           instruction : in STD_LOGIC_VECTOR(31 downto 0);
           Hready : in STD_LOGIC;
@@ -83,6 +85,7 @@ architecture Behavioral of processor is
             Aenable : in STD_LOGIC;
             Benable : in STD_LOGIC;
             Menable : in STD_LOGIC;
+            SPSRenable : in STD_LOGIC;
             PMPathMode : in STD_LOGIC_VECTOR(2 downto 0);
             PMPathByteOffset : in STD_LOGIC_VECTOR(1 downto 0);
             ALUmode : in STD_LOGIC_VECTOR(3 downto 0);
@@ -91,12 +94,13 @@ architecture Behavioral of processor is
             rad1select : in STD_LOGIC_VECTOR(1 downto 0);
             rad2select : in STD_LOGIC;
             wadselect : in STD_LOGIC_VECTOR(1 downto 0);
-            wdselect : in STD_LOGIC;
+            wdselect : in STD_LOGIC_VECTOR(1 downto 0);
             HRdata : in STD_LOGIC_VECTOR(31 downto 0);
             --ShiftType : in STD_LOGIC_VECTOR(1 downto 0);  --read directly from instruction
             ShiftAmountSelect : in STD_LOGIC;
             ShifterInSelect : in STD_LOGIC;
             Fset : in STD_LOGIC;
+            Fselect : in STD_LOGIC;
             --output to controller :
             instruction : out STD_LOGIC_VECTOR(31 downto 0);
             flagZ : out STD_LOGIC;
@@ -120,6 +124,7 @@ architecture Behavioral of processor is
     signal Aenable :  STD_LOGIC;
     signal Benable :  STD_LOGIC;
     signal Menable :  STD_LOGIC;
+    signal SPSRenable : STD_LOGIC;
     signal PMPathMode :  STD_LOGIC_VECTOR(2 downto 0);
     signal PMPathByteOffset :  STD_LOGIC_VECTOR(1 downto 0);
     signal ALUmode :  STD_LOGIC_VECTOR(3 downto 0);
@@ -128,10 +133,11 @@ architecture Behavioral of processor is
     signal rad1select :  STD_LOGIC_VECTOR(1 downto 0);
     signal rad2select :  STD_LOGIC;
     signal wadselect :  STD_LOGIC_VECTOR(1 downto 0);
-    signal wdselect :  STD_LOGIC;
+    signal wdselect :  STD_LOGIC_VECTOR(1 downto 0);
     signal ShiftAmountSelect :  STD_LOGIC;
     signal ShifterSelect :  STD_LOGIC;
     signal Fset :  STD_LOGIC;
+    signal Fselect : STD_LOGIC;
     signal instruction :  STD_LOGIC_VECTOR(31 downto 0);
     signal state_temp : STD_LOGIC_VECTOR(4 downto 0);
     signal flagZ :  STD_LOGIC;
@@ -164,6 +170,7 @@ begin
             Aenable => Aenable,
             Benable => Benable,
             Menable => Menable,
+            SPSRenable => SPSRenable,
             PMPathMode => PMPathMode,
             PMPathByteOffset => PMPathByteOffset,
             ALUmode => ALUmode,
@@ -177,6 +184,7 @@ begin
             ShiftAmountSelect => ShiftAmountSelect,
             ShifterInSelect => ShifterSelect,
             Fset => Fset,
+            Fselect => Fselect,
             instruction => instruction,
             flagZ => flagZ,
             flagN => flagN,
@@ -201,6 +209,7 @@ begin
             Aenable => Aenable,
             Benable => Benable,
             Menable => Menable,
+            SPSRenable => SPSRenable,
             PMPathMode => PMPathMode,
             PMPathByteOffset => PMPathByteOffset,
             ALUmode => ALUmode,
@@ -215,6 +224,7 @@ begin
             ShiftAmountSelect => ShiftAmountSelect,
             ShifterInSelect => ShifterSelect,
             Fset => Fset,
+            Fselect => Fselect,
             instruction => instruction,
             Hready => Hready,
             flagZ => flagZ,

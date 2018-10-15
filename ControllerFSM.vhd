@@ -41,7 +41,8 @@ entity ControllerFSM is
          ins_variant : in STD_LOGIC_VECTOR (1 downto 0);
          Hready : in STD_LOGIC;
          skip_ins : in STD_LOGIC;
-         state : out STD_LOGIC_VECTOR(4 downto 0));
+         state : out STD_LOGIC_VECTOR(4 downto 0);
+         SWI_state : out STD_LOGIC_VECTOR(3 downto 0));
 end ControllerFSM;
 
 architecture Behavioral of ControllerFSM is
@@ -75,6 +76,9 @@ architecture Behavioral of ControllerFSM is
         Branch_IncrementPCby4_SavePC, --11001
         DT_str_idle, --11010
         DP_calculateResult, --11011
+        SWI_saveCPSR, --11100, 0001
+        SWI_updatePC, --11100, 0010
+        SWI_retrieveCPSR, --11100, 0011
         Idle --11111
         );
     
@@ -111,7 +115,16 @@ begin
         "11001" when Branch_IncrementPCby4_SavePC,
         "11010" when DT_str_idle,
         "11011" when DP_calculateResult,
+        "11100" when SWI_saveCPSR,
+        "11100" when SWI_updatePC,
+        "11100" when SWI_retrieveCPSR,
         "11111" when Idle; --11111
+        
+    with currentState select SWI_state <= 
+        "0001" when SWI_saveCPSR,
+        "0010" when SWI_updatePC,
+        "0011" when SWI_retrieveCPSR,
+        "0000" when others;
 
     process(clk,reset)
     begin
@@ -151,7 +164,13 @@ begin
                         elsif ins_type = "10" then
                             currentState <= MulMla_LoadRn;
                         elsif ins_type = "11" then
-                            currentState <= Branch_IncrementPCby4;
+                            if ins_subtype = "010" then
+                                currentState <= SWI_saveCPSR;
+                            elsif ins_subtype = "011" then 
+                                currentState <= SWI_retrieveCPSR;
+                            else
+                                currentState <= Branch_IncrementPCby4;
+                            end if;
                         else
                             currentState <= InstructionFetch_PCincrement;
                         end if;
@@ -175,7 +194,16 @@ begin
                     end if;
                     
                 when Branch_updateLR =>
-                    currentState <= InstructionFetch_PCincrement; 
+                    currentState <= InstructionFetch_PCincrement;
+                    
+                when SWI_saveCPSR =>
+                    currentState <= SWI_updatePC;
+                    
+                when SWI_updatePC =>
+                    currentState <= InstructionFetch_PCincrement;
+                    
+                when SWI_retrieveCPSR => 
+                    currentState <= InstructionFetch_PCincrement;    
                     
                 when DP_calculateResult =>
                     currentState <= DP_shiftOp2_updateRES_flags;

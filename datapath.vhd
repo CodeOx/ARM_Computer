@@ -24,12 +24,13 @@ entity datapath is
         rad1select : in STD_LOGIC_VECTOR(1 downto 0);
         rad2select : in STD_LOGIC;
         wadselect : in STD_LOGIC_VECTOR(1 downto 0);
-        wdselect : in STD_LOGIC;
+        wdselect : in STD_LOGIC_vector(1 downto 0);
         HRdata : in STD_LOGIC_VECTOR(31 downto 0);
         --ShiftType : in STD_LOGIC_VECTOR(1 downto 0);  --read directly from instruction
         ShiftAmountSelect : in STD_LOGIC;
         ShifterInSelect : in STD_LOGIC;
         Fset : in STD_LOGIC;
+        Fselect : in STD_LOGIC;
         --output to controller :
         instruction : out STD_LOGIC_VECTOR(31 downto 0);
         flagZ : out STD_LOGIC;
@@ -173,7 +174,10 @@ begin
            "1111" when wadselect = "11" else
            "1110";
 
-    wd <= RES when wdselect = '0' else DR ;
+    wd <= RES when wdselect = "00" else 
+          DR when wdselect = "01" else
+          "0000000000000000" & ins(15 downto 0) when wdselect = "10" else
+          SPSR(31 downto 0);
 
     ALUop1 <= PC when ALUop1select = '0' else A;
     ALUop2 <= "00000000000000000000000000000100" when ALUop2select = "001" else
@@ -304,10 +308,17 @@ begin
     process (clk)
     begin
         if rising_edge(clk) and Fset = '1' then
-            Z <= ALUz;
-            N <= ALUn;
-            V <= ALUv;
-            C <= ALUc;
+            if Fselect = '0' then
+                Z <= ALUz;
+                N <= ALUn;
+                V <= ALUv;
+                C <= ALUc;
+            else
+                Z <= SPSR(35);
+                N <= SPSR(34);
+                V <= SPSR(33);
+                C <= SPSR(32);
+            end if;
         end if;
     end process;
     process (clk)

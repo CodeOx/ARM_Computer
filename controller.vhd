@@ -25,6 +25,7 @@ entity controller is
       Aenable : out STD_LOGIC;
       Benable : out STD_LOGIC;
       Menable : out STD_LOGIC;
+      SPSRenable : out STD_LOGIC;
       PMPathMode : out STD_LOGIC_VECTOR(2 downto 0);
       PMPathByteOffset : out STD_LOGIC_VECTOR(1 downto 0);
       ALUmode : out STD_LOGIC_VECTOR(3 downto 0);
@@ -33,13 +34,14 @@ entity controller is
       rad1select : out STD_LOGIC_VECTOR(1 downto 0);
       rad2select : out STD_LOGIC;
       wadselect : out STD_LOGIC_VECTOR(1 downto 0);
-      wdselect : out STD_LOGIC;
+      wdselect : out STD_LOGIC_VECTOR(1 downto 0);
       Hwrite : out STD_LOGIC;
       Htrans : out STD_LOGIC_VECTOR(1 downto 0);
       --ShiftType : in STD_LOGIC_VECTOR(1 downto 0);  --read directly from instruction
       ShiftAmountSelect : out STD_LOGIC;
       ShifterInSelect : out STD_LOGIC;
       Fset : out STD_LOGIC;
+      Fselect : out STD_LOGIC;
       --output to controller :
       instruction : in STD_LOGIC_VECTOR(31 downto 0);
       Hready : in STD_LOGIC;
@@ -61,7 +63,8 @@ architecture Behavioral of controller is
            ins_variant : in STD_LOGIC_VECTOR (1 downto 0);
            Hready : in STD_LOGIC;
            skip_ins : in STD_LOGIC;
-           state : out STD_LOGIC_VECTOR(4 downto 0));
+           state : out STD_LOGIC_VECTOR(4 downto 0);
+           SWI_state : out STD_LOGIC_VECTOR(3 downto 0));
     end Component;
 
     component flagchecker
@@ -100,6 +103,7 @@ architecture Behavioral of controller is
     signal alu_signal : STD_LOGIC_VECTOR(3 downto 0);
     signal skip_ins : STD_LOGIC;
     signal state : STD_LOGIC_VECTOR(4 downto 0);
+    signal SWI_state : STD_LOGIC_VECTOR(3 downto 0);
 
 begin
     
@@ -116,7 +120,8 @@ begin
                ins_variant => ins_variant,
                Hready => Hready,
                skip_ins => skip_ins,
-               state => state);
+               state => state,
+               SWI_state => SWI_state);
              
     --condition checker
     conditionChecker : flagchecker 
@@ -171,7 +176,9 @@ begin
                     (state = "00111" and predicationResult = '1') or 
                     (state = "01100" and predicationResult = '1') or
                     (state = "10010" and predicationResult = '1') or
-                    (state = "10000" and instruction (21) = '1' and predicationResult = '1')
+                    (state = "10000" and instruction (21) = '1' and predicationResult = '1') or
+                    (state = "11100" and SWI_state = "0010" and predicationResult = '1') or 
+                    (state = "11100" and SWI_state = "0011" and predicationResult = '1')
                 else '0';
     
     Aenable <= '1' when state = "00001" or state = "01000" or state = "01010" else '0';
@@ -179,6 +186,8 @@ begin
     Benable <= '1' when state = "00001" or state = "01110" else '0';
     
     Menable <= '1' when state = "01001" else '0';
+    
+    SPSRenable <= '1' when state = "11100" and SWI_state = "0001" else '0';
     
     PMPathMode <= ins_subtype;
     
@@ -204,12 +213,15 @@ begin
     
     rad2select <= '1' when state = "01110" else '0';
     
-    wadselect <= "11" when state = "00001" or state = "11001" or state = "00100" else
+    wadselect <= "11" when state = "00001" or state = "11001" or state = "00100" or (state = "11100" and SWI_state = "0010") or (state = "11100" and SWI_state = "0011") else
                  "10" when state = "01100" or state = "10000" else 
-                 "00" when state = "00101" else
+                 "00" when state = "00101" or (state = "11100" and SWI_state = "0011") else
                  "01";
     
-    wdselect <= '1' when state = "10010" else '0';
+    wdselect <= "01" when state = "10010" else
+                "10" when (state = "11100" and SWI_state = "0010") else
+                "11" when (state = "11100" and SWI_state = "0011") else
+                "00";
     
     Hwrite <= '1' when state = "10110" and predicationResult = '1' else '0';
     
@@ -219,7 +231,11 @@ begin
           
     ShifterInSelect <= '1' when ((state = "00110" or state = "11011") and ins_variant = "00") else '0';
     
-    Fset <= '1' when (state = "00110" and predicationResult = '1' and ins_subtype = "000") else '0';--or (state = "01011" and predicationResult = '1') else '0'; 
+    Fset <= '1' when (state = "00110" and predicationResult = '1' and ins_subtype = "000") or
+                     (state = "11100" and SWI_state = "0011")
+                else '0';--or (state = "01011" and predicationResult = '1') else '0';
+                
+    Fselect <= '1' when (state = "11100" and SWI_state = "0011" ) else '0';
 
 
 end Behavioral;

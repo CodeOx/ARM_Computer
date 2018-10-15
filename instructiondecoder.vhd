@@ -34,9 +34,11 @@ end instructiondecoder;
 --      000 mul
 --      001 mla
 
--- 11 B/BL
+-- 11 B/BL/SWI_go/SWI_return
 --      000 b
 --      001 bl
+--      010 SWI_go
+--      011 SWI_ret
 
 architecture Behavioral of instructiondecoder is
 
@@ -133,7 +135,17 @@ begin
             undefined <= '0';
         end if;
     else 
-        undefined <= '1';
+        if ins(25 downto 24) = "11" then
+            undefined <= '0';
+            ins_type <= "11";
+            if ins(23) = '0' then
+                ins_subtype <= "010";
+            else
+                ins_subtype <= "011";
+            end if;
+        else                
+            undefined <= '1';
+        end if;
     end if;
 end process;
 end Behavioral;
