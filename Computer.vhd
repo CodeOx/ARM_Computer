@@ -224,7 +224,7 @@ begin
 
     dataToLED <= "0000000000000000" & (Z & N & V & C & dataFromProcessor(11 downto 0));
     
-    debug_controls <= "0000";
+    debug_controls <= "1111";
 
     main_processor : processor
       Port Map(   clk => slowclock,
