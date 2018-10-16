@@ -168,6 +168,8 @@ begin
                                 currentState <= SWI_saveCPSR;
                             elsif ins_subtype = "011" then 
                                 currentState <= SWI_retrieveCPSR;
+                            elsif ins_subtype <= "111" then
+                                currentState <= Idle;
                             else
                                 currentState <= Branch_IncrementPCby4;
                             end if;

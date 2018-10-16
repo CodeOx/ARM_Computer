@@ -195,8 +195,8 @@ begin
 	   end if;
 	end process;
     
-    slowclock<= slowclockvector(23);
-    --slowclock <= clk;
+    --slowclock<= slowclockvector(23);
+    slowclock <= clk;
     
     selectSlave <= "001" when Haddr = "0000111111111100" else
                    "010" when Haddr = "0000111111111101" else

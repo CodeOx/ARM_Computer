@@ -47,8 +47,13 @@ architecture FULL of UART_LOOPBACK is
     Type State is (
         IDLE,
         WRITE_TO_PC,
+        WRITE_WAIT,
         READ_FROM_PC,
-        WRITE_LOOPBACK
+        READ_COMPLETE_1,
+        READ_COMPLETE_2,
+        WRITE_LOOPBACK,
+        WRITE_COMPLETE_1,
+        WRITE_COMPLETE_2
     );
     signal BUSY : STD_LOGIC;
     signal FRAME_ERR : STD_LOGIC;
@@ -56,6 +61,7 @@ architecture FULL of UART_LOOPBACK is
     signal data_out_temp    : std_logic_vector(7 downto 0);
     signal data_send_temp : STD_LOGIC;
     signal valid   : std_logic;
+    signal valid_reg : std_logic := '0';
     signal curr_state : State:=IDLE;
 
 begin
@@ -95,17 +101,34 @@ begin
                             curr_state <= READ_FROM_PC;
                        end if;
                    end if;
-                when READ_FROM_PC=>
-                    curr_state <= WRITE_LOOPBACK;
+                when READ_FROM_PC =>
+                    if valid_reg = '1' then
+                        curr_state <= READ_COMPLETE_1;
+                    end if;
+                when READ_COMPLETE_1=>
+                    curr_state <= READ_COMPLETE_2;
+                when WRITE_TO_PC =>
+                    curr_state <= WRITE_WAIT;
+                when WRITE_WAIT=>
+                    if BUSY = '0' then
+                        curr_state <= WRITE_COMPLETE_1;
+                    end if;
+                when WRITE_COMPLETE_1=>
+                    curr_state <= WRITE_COMPLETE_2;
                 when others => curr_state <= IDLE;
             end case;
         end if;
-    end process;    
+    end process;  
     
-    data_send_temp <= '1' when curr_state = WRITE_TO_PC or curr_state = WRITE_LOOPBACK else '0';
-    data_in_temp <= HWData(7 downto 0) when curr_state = WRITE_TO_PC else
+    valid_reg <= valid;
+    
+    data_send_temp <= '1' when curr_state = WRITE_TO_PC or valid = '1' else '0';
+    data_in_temp <= HWData(7 downto 0) when curr_state = WRITE_TO_PC or curr_state = WRITE_WAIT else
                     data_out_temp;
     HRData <= "000000000000000000000000" & data_out_temp;
-    HReady <= valid;
+    HReady <= '1' when curr_state = READ_COMPLETE_1 or 
+                       curr_state = READ_COMPLETE_2 or
+                       curr_state = WRITE_COMPLETE_1 or
+                       curr_state = WRITE_COMPLETE_2 else '0';
 
 end FULL;
