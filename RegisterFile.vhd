@@ -33,7 +33,7 @@ begin
             registerfile(to_integer(unsigned(write_address))) <= write_data;
         end if;
         if reset='1' then
-            registerfile(15) <= "00000000000000000000000000000000";
+            registerfile(15) <= "00000000000000000000000001010000";
         end if;
         
     end if;

@@ -31,6 +31,9 @@ str r1,[r0,#4094]
 str r1,[r0,#4093]
 @SWI_readChar
 @SWI_writeChar
+@SWI_readLine
+ldr r0,[r0]
+@SWI_writeChar
 mov r0,#0
 mov r1,#4
 str r1,[r0,#4094]

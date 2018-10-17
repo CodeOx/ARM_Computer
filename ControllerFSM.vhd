@@ -163,16 +163,14 @@ begin
                             currentState <= DT_postIndex_CalcAddress;
                         elsif ins_type = "10" then
                             currentState <= MulMla_LoadRn;
+                        elsif ins_type = "11" and ins_subtype = "010" then
+                            currentState <= SWI_saveCPSR;
+                        elsif ins_type = "11" and ins_subtype = "011" then 
+                            currentState <= SWI_retrieveCPSR;
+                        elsif ins_type = "11" and ins_subtype = "111" then
+                            currentState <= Idle;
                         elsif ins_type = "11" then
-                            if ins_subtype = "010" then
-                                currentState <= SWI_saveCPSR;
-                            elsif ins_subtype = "011" then 
-                                currentState <= SWI_retrieveCPSR;
-                            elsif ins_subtype <= "111" then
-                                currentState <= Idle;
-                            else
-                                currentState <= Branch_IncrementPCby4;
-                            end if;
+                            currentState <= Branch_IncrementPCby4;
                         else
                             currentState <= InstructionFetch_PCincrement;
                         end if;

@@ -55,6 +55,10 @@ architecture FULL of UART_LOOPBACK is
         WRITE_COMPLETE_1,
         WRITE_COMPLETE_2
     );
+    Type newlineState is (
+        LF,
+        CHAR
+    );
     signal BUSY : STD_LOGIC;
     signal FRAME_ERR : STD_LOGIC;
     signal data_in_temp    : std_logic_vector(7 downto 0);
@@ -63,6 +67,7 @@ architecture FULL of UART_LOOPBACK is
     signal valid   : std_logic;
     signal valid_reg : std_logic := '0';
     signal curr_state : State:=IDLE;
+    signal char_state : newlineState:=CHAR;
 
 begin
 	uart_i: entity work.UART
@@ -120,10 +125,26 @@ begin
         end if;
     end process;  
     
+    process(CLK, RST_N)
+    begin
+        if RST_N = '1' then 
+           char_state<=CHAR;
+        elsif rising_edge(CLK) then
+            case char_state is
+                when CHAR=>
+                    if data_out_temp = "00001010" and valid = '1' then
+                        char_state <= LF;
+                    end if;
+                when others=> char_state <= CHAR;
+            end case;
+        end if;
+    end process;
+    
     valid_reg <= valid;
     
-    data_send_temp <= '1' when curr_state = WRITE_TO_PC or valid = '1' else '0';
+    data_send_temp <= '1' when curr_state = WRITE_TO_PC or valid = '1' else '0';--or char_state = LF else '0';
     data_in_temp <= HWData(7 downto 0) when curr_state = WRITE_TO_PC or curr_state = WRITE_WAIT else
+                    --"00001101" when char_state = LF else
                     data_out_temp;
     HRData <= "000000000000000000000000" & data_out_temp;
     HReady <= '1' when curr_state = READ_COMPLETE_1 or 
