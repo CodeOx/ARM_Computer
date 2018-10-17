@@ -20,7 +20,7 @@ end RegisterFile;
 architecture Behavioral of RegisterFile is
 subtype	word is std_logic_vector(31 downto 0) ;
 type regArray is array (0 to 15) of word;
-signal registerfile : regArray := ((others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),("00000000000000000000000001010000"));
+signal registerfile : regArray := ((others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),(others=>'0'),("00000000000000000000000110010000"),(others=>'0'),("00000000000000000000000001100100"));
 begin
     read_dataA <= registerfile(to_integer(unsigned(read_addressA)));
     read_dataB <= registerfile(to_integer(unsigned(read_addressB)));
@@ -33,7 +33,8 @@ begin
             registerfile(to_integer(unsigned(write_address))) <= write_data;
         end if;
         if reset='1' then
-            registerfile(15) <= "00000000000000000000000001010000";
+            registerfile(15) <= "00000000000000000000000001100100";
+            registerfile(13) <= "00000000000000000000000110010000";
         end if;
         
     end if;
