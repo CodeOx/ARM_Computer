@@ -1,5 +1,6 @@
-programming env for ARM\n-Chetan Mittal, IITD\r
+programming env for ARM\n-Chetan Mittal, IITD\r1. load program\n2. execute\r
 
 programming env for ARM
 -Chetan Mittal, IITD
-
+1. load program
+2. execute

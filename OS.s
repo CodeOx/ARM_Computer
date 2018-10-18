@@ -34,8 +34,27 @@ mov r0,#0
 
 mov r0, #0
 @SWI_writeLine
+Start:
+mov r0, #180
+@SWI_writeLine
+mov r0, #0	@replacement for SWI
+@SWI_readChar
+mov r0, #0	@replacement for SWI
+cmp r0, #49
+beq LoadFile
+cmp r0, #50
+beq Execute
+cmp r0, #113
+beq Exit
+b Start
+LoadFile:
+b Start
+Execute:
+@SWI_execute
+b Start
+Exit:
 
-@user program begins after 27 instructions, user data begins after 100 locations
+@user program begins after 100 instructions, user data begins after 100 locations
 
 mov r1, #1
 mov r0, #0
