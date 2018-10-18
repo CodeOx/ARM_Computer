@@ -45,7 +45,13 @@ str r1,[r0,#4093]
 @SWI_writeChar
 @SWI_readLine
 @SWI_writeLine
-mov r0,#0
+mov r1,#0
+Here:
+ldr r0, [r1, #4095]
+str r0, [r1, #4095]
+cmp r0, #13
+bne Here
+mov r0, #0
 mov r1,#4
 str r1,[r0,#4094]
 @SWI_exit
