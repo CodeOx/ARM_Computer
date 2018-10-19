@@ -8,6 +8,7 @@ entity datapath is
         carry : in STD_LOGIC;
         memoryReadEnable : in STD_LOGIC;
         memoryWriteEnable : in STD_LOGIC;
+        insMemoryWriteEnable : in STD_LOGIC;
         IRenable : in STD_LOGIC;
         DRenable : in STD_LOGIC;
         RESenable : in STD_LOGIC;

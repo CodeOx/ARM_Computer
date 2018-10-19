@@ -34,10 +34,13 @@ mov r0,#0
 
 mov r0, #0
 @SWI_writeLine
+
 Start:
+
 mov r0, #180
 @SWI_writeLine
 mov r0, #0	@replacement for SWI
+
 @SWI_readChar
 mov r0, #0	@replacement for SWI
 cmp r0, #49
@@ -47,11 +50,32 @@ beq Execute
 cmp r0, #113
 beq Exit
 b Start
+
 LoadFile:
+
+mov r0, #13
+@SWI_writeChar
+mov r0, #0	@replacement for SWI
+mov r1, #400
+mov r2, #0
+LoadLoop:
+ldr r0, [r2, #4095]
+srt r0, [r1]
+add r1, r1, #4
+cmp r0, #4
+bne LoadLoop
+mov r0, #288
+@SWI_writeLine
+mov r0, #0	@replacement for SWI
 b Start
+
 Execute:
+mov r0, #13
+@SWI_writeChar
+mov r0, #0	@replacement for SWI
 @SWI_execute
 b Start
+
 Exit:
 
 @user program begins after 100 instructions, user data begins after 100 locations
