@@ -61,12 +61,28 @@ mov r0, #13
 mov r0, #0	@replacement for SWI
 mov r1, #400
 mov r2, #0
+
 LoadLoop:
-ldr r0, [r2, #4095]
-str r0, [r1]
-add r1, r1, #4
-cmp r0, #4
-bne LoadLoop
+mov r0, #0
+ldr r3, [r2, #4095]
+cmp r3, #4
+beq LoadDone
+mov r3, r3, LSL #24
+orr r0,r0,r3
+ldr r3, [r2, #4095]
+mov r3, r3, LSL #16
+orr r0,r0,r3
+ldr r3, [r2, #4095]
+mov r3, r3, LSL #8
+orr r0,r0,r3
+ldr r3, [r2, #4095]
+orr r0,r0,r3
+
+@SWI_saveIns
+mov r0, #0 	@replacement for SWI
+b LoadLoop
+
+LoadDone:
 mov r0, #288
 @SWI_writeLine
 mov r0, #0	@replacement for SWI

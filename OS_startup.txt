@@ -1,6 +1,6 @@
 programming env for ARM\n-Chetan Mittal, IITD\r1. load program\n2. execute\r
 
-done\r
+\ndone\r
 
 programming env for ARM
 -Chetan Mittal, IITD
