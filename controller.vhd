@@ -160,7 +160,9 @@ begin
    
     --generating control signals from state and instruction -> combinational
     
-    memoryWriteEnable <= '0';
+    memoryWriteEnable <= '1' when (state = "11100" and SWI_state = "0100") or
+                             (state = "11100" and SWI_state = "0101") or
+                             (state = "11100" and SWI_state = "0110") else '0';
     
     IRenable <= '1' when state = "10101" else '0';
     

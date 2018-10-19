@@ -49,6 +49,9 @@ cmp r0, #50
 beq Execute
 cmp r0, #113
 beq Exit
+mov r0, #13
+@SWI_writeChar
+mov r0, #0	@replacement for SWI
 b Start
 
 LoadFile:
@@ -60,7 +63,7 @@ mov r1, #400
 mov r2, #0
 LoadLoop:
 ldr r0, [r2, #4095]
-srt r0, [r1]
+str r0, [r1]
 add r1, r1, #4
 cmp r0, #4
 bne LoadLoop
@@ -92,7 +95,7 @@ mov r1,#0
 Here:
 ldr r0, [r1, #4095]
 str r0, [r1, #4095]
-cmp r0, #13
+cmp r0, #4
 bne Here
 mov r0, #0
 mov r1,#4

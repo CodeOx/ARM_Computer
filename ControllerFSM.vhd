@@ -79,6 +79,9 @@ architecture Behavioral of ControllerFSM is
         SWI_saveCPSR, --11100, 0001
         SWI_updatePC, --11100, 0010
         SWI_retrieveCPSR, --11100, 0011
+        SWI_writeIns, --11100, 0100
+        SWI_writeIns_memWait1, --11100, 0101
+        SWI_writeIns_memWait2, --11100, 0110
         Idle --11111
         );
     
@@ -118,12 +121,18 @@ begin
         "11100" when SWI_saveCPSR,
         "11100" when SWI_updatePC,
         "11100" when SWI_retrieveCPSR,
+        "11100" when SWI_writeIns,
+        "11100" when SWI_writeIns_memWait1,
+        "11100" when SWI_writeIns_memWait2,
         "11111" when Idle; --11111
         
     with currentState select SWI_state <= 
         "0001" when SWI_saveCPSR,
         "0010" when SWI_updatePC,
         "0011" when SWI_retrieveCPSR,
+        "0100" when SWI_writeIns,
+        "0101" when SWI_writeIns_memWait1,
+        "0110" when SWI_writeIns_memWait2,
         "0000" when others;
 
     process(clk,reset)
@@ -167,6 +176,8 @@ begin
                             currentState <= SWI_saveCPSR;
                         elsif ins_type = "11" and ins_subtype = "011" then 
                             currentState <= SWI_retrieveCPSR;
+                        elsif ins_type = "11" and ins_subtype = "100" then 
+                            currentState <= SWI_writeIns;
                         elsif ins_type = "11" and ins_subtype = "111" then
                             currentState <= Idle;
                         elsif ins_type = "11" then
@@ -203,7 +214,16 @@ begin
                     currentState <= InstructionFetch_PCincrement;
                     
                 when SWI_retrieveCPSR => 
-                    currentState <= InstructionFetch_PCincrement;    
+                    currentState <= InstructionFetch_PCincrement;   
+                    
+                when SWI_writeIns => 
+                    currentState <= SWI_writeIns_memWait1;
+                   
+                when SWI_writeIns_memWait1 => 
+                    currentState <= SWI_writeIns_memWait2;
+                    
+                when SWI_writeIns_memWait2 =>
+                    currentState <= InstructionFetch_PCincrement;
                     
                 when DP_calculateResult =>
                     currentState <= DP_shiftOp2_updateRES_flags;

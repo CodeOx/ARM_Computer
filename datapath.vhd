@@ -161,7 +161,8 @@ begin
     
     debug_out <= debug_out1; 
 
-    memoryAddress <= PC;
+    memoryAddress <= PC when memoryWriteEnable = '0' else B;
+    dataToMemory <= A;
     ins <= IR;
     rad1 <= ins(19 downto 16) when rad1select = "00" else 
             ins(15 downto 12) when rad1select = "01" else

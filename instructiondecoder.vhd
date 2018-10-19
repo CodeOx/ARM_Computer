@@ -39,6 +39,7 @@ end instructiondecoder;
 --      001 bl
 --      010 SWI_go
 --      011 SWI_ret
+-- \    100 SWI_writeIns
 --      111 SWI_exit
 
 architecture Behavioral of instructiondecoder is
@@ -143,6 +144,8 @@ begin
                 ins_subtype <= "010";
             elsif ins(23 downto 0) = "111111111111111111111111" then
                 ins_subtype <= "111";
+            elsif ins(23 downto 22) = "11" then
+                ins_subtype <= "100";
             else
                 ins_subtype <= "011";
             end if;
