@@ -1,0 +1,10 @@
+h = raw_input()
+h = h.replace(" ", "")
+h = h.replace(",", "")
+h = h.replace("\n", "")
+h = h.lower()
+byte_arr = bytearray.fromhex(h)
+
+f = open('prog', 'wb')
+f.write(bytearray)
+f.close()

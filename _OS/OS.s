@@ -99,23 +99,14 @@ b Start
 
 Exit:
 
-@user program begins after 100 instructions, user data begins after 100 locations
-
-mov r1, #1
-mov r0, #0
-str r1,[r0,#4094]
-str r1,[r0,#4093]
-@SWI_readChar
+mov r0, #101
 @SWI_writeChar
-@SWI_readLine
-@SWI_writeLine
-mov r1,#0
-Here:
-ldr r0, [r1, #4095]
-str r0, [r1, #4095]
-cmp r0, #4
-bne Here
-mov r0, #0
-mov r1,#4
-str r1,[r0,#4094]
+mov r0, #120
+@SWI_writeChar
+mov r0, #105
+@SWI_writeChar
+mov r0, #116
+@SWI_writeChar
 @SWI_exit
+
+@user program begins after 100 instructions, user data begins after 100 locations
