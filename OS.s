@@ -80,6 +80,7 @@ orr r0,r0,r3
 
 @SWI_saveIns
 mov r0, #0 	@replacement for SWI
+add r1,r1,#4
 b LoadLoop
 
 LoadDone:
@@ -93,6 +94,7 @@ mov r0, #13
 @SWI_writeChar
 mov r0, #0	@replacement for SWI
 @SWI_execute
+mov r0, #0	@replacement for SWI
 b Start
 
 Exit:
