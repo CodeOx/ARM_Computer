@@ -1,10 +1,16 @@
+@@@@@ SWI_readChar @@@@@
+
 mov r0, #0
 ldr r0, [r0, #4095]
 @SWI_ret
 
+@@@@@ SWI_writeChar @@@@@
+
 mov r1, #0
 str r0, [r1, #4095]
 @SWI_ret
+
+@@@@@ SWI_readLine @@@@@
 
 mov r0, r13	@starting address
 mov r2, #0
@@ -17,6 +23,8 @@ cmp r1, #13
 bne ReadLoop
 add r13, r3, #4
 @SWI_ret
+
+@@@@@ SWI_writeLine @@@@@
 
 mov r1, r0
 mov r2, #0
@@ -31,15 +39,20 @@ bne WriteLoop
 mov r0,#0
 
 @OS startup begins after 25 instructions
+@@@@@ Text displayed on startup @@@@@
 
 mov r0, #0
 @SWI_writeLine
 
 Start:
 
+@@@@@ Displaying options to load file and execute program  @@@@@
+
 mov r0, #180
 @SWI_writeLine
 mov r0, #0	@replacement for SWI
+
+@@@@@ Reading user input @@@@@
 
 @SWI_readChar
 mov r0, #0	@replacement for SWI
@@ -53,6 +66,8 @@ mov r0, #13
 @SWI_writeChar
 mov r0, #0	@replacement for SWI
 b Start
+
+@@@@@ Program to load user file @@@@@
 
 LoadFile:
 
@@ -89,6 +104,8 @@ mov r0, #288
 mov r0, #0	@replacement for SWI
 b Start
 
+@@@@@ Program to execute the user code @@@@@
+
 Execute:
 mov r0, #13
 @SWI_writeChar
@@ -96,6 +113,8 @@ mov r0, #0	@replacement for SWI
 @SWI_execute
 mov r0, #0	@replacement for SWI
 b Start
+
+@@@@@ Exit @@@@@
 
 Exit:
 
