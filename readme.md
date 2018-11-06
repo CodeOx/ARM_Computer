@@ -24,7 +24,7 @@ A sample ARM program, helloUser, is available in the _UserProg directory for tes
 
 | Instruction | Symbol | Hex Code | Action |
 | ------------| ------ | -------- | ------ |
-| goto        | SWI_go | EF000000 | saves the currrent state (falgs and PC) to the SPSR and updates PC to the address specified in the instruction (Last 16 bits or last 4 digits in the Hex Code) |
+| goto        | SWI_go | EF00xxxx | saves the currrent state (falgs and PC) to the SPSR and updates PC to the address specified in the instruction (Last 16 bits or last 4 digits in the Hex Code) |
 | return  | SWI_ret | EF800000 | restores flag and PC from the SPSR |
 | print char | SWI_writeChar | EF00000C | Prints the character (stored in R0) to the terminal |
 | read char | SWI_readChar | EF000000 | Reads character from the keyboard and stores the ASCII value in R0 |
@@ -38,3 +38,27 @@ A sample ARM program, helloUser, is available in the _UserProg directory for tes
 #### 4    User program file
 
 The last command of the user program must be SWI_done indicating the completion of execution. The file must end with EOT (Hex : 04) byte.
+
+#### 5    Implementation Details
+##### 5.1    Read and Write character
+Two instrcutions (str rx, [ry, #4095], ldr rx, [ry, #4095], where ry contains #0) are used to read and write characters using the UART interface
+
+##### 5.2    SWI calls:
+Three basic SWI instrcutions have been implemeted in the hardware, all other SWI instructions are implemented using these three :
+1. SWI_go (EF00xxxx) : The instruction saves the CPSR (the current value of flags and the PC) to SPSR and changes the PC to "xxxx" (Last 16 bits of the instruction)
+2. SWI_ret (EF800000) : The instruction restores the CPSR from SPSR, therefore, updating the PC to the instruction from where SWI_go instruction was executed
+3. SWI_exit (EFFFFFFF) : Stops the PC from incrementing, changes the state of the processor to Idle
+
+All other SWI_instructions are SWI_go commands where the address in the instruction correponds to instructions in the OS file : 
+
+As an example, consider SWI_writeChar (EF00000C) instruction {An SWI_go instruction with address 000C} . When the instruction is executed, the flags are saved in SPSR and PC is changed to 0x0C. The instruction at the address 0x0C and the following addreses can be found in the OS file :
+
+0x0C : mov r1, #0
+
+0x10 : str r0, [r1, #4095]
+
+0x14 : @SWI_ret
+
+The first one moves 0 to r1, the second writes the character in r0 to the UART interface, and the third is used to return PC to the address from where SWI_writeChar was called, thus completing the execution of SWI_writeChar instruction.
+
+The remaining SWI instructions work in a similar manner, by branching to a piece of code in the OS, completing the execution and returing to the location from where SWI call was made.
