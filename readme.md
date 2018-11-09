@@ -39,15 +39,28 @@ A sample ARM program, helloUser, is available in the _UserProg directory for tes
 
 The last command of the user program must be SWI_done indicating the completion of execution. The file must end with EOT (Hex : 04) byte.
 
-#### 5    Implementation Details
-##### 5.1    Read and Write character
+#### 5    Peripherals
+
+The peripherals can be accessed by ldr/str instructions for reading/writing respectively. Address map is described below :
+
+| Peripheral | Address | Usage |
+| -----------| ------- | ----- |
+| Switches   | 4092 | ldr rx, [ry, #4092] {ry = #0}: loads value from the switches in rx |
+| LED's  | 4093 | str rx, [ry, #4093] {ry = #0}: displays least significant 16 bits of rx on the LED's on FPGA |
+| Seven Segment Display (SSD) | 4094 | str rx, [ry, #4094] {ry = #0}: displays the hexadecimal value of least significant 16 bits of rx on the SSD |
+| UART | 4095 | ldr rx, [ry, #4095] {ry = #0}: loads a character from the keboard into rx; str rx, [ry, #4095] {ry = #0}: writes the character corresponding to the least significant 8 bits of rx to the PC terminal | 
+
+
+#### 6    Implementation Details
+##### 6.1    Read and Write character
 Two instrcutions (str rx, [ry, #4095], ldr rx, [ry, #4095], where ry contains #0) are used to read and write characters using the UART interface
 
-##### 5.2    SWI calls:
-Three basic SWI instrcutions have been implemeted in the hardware, all other SWI instructions are implemented using these three :
+##### 6.2    SWI calls:
+Four basic SWI instrcutions have been implemeted in the hardware, all other SWI instructions are implemented using these four :
 1. SWI_go (EF00xxxx) : The instruction saves the CPSR (the current value of flags and the PC) to SPSR and changes the PC to "xxxx" (Last 16 bits of the instruction)
 2. SWI_ret (EF800000) : The instruction restores the CPSR from SPSR, therefore, updating the PC to the instruction from where SWI_go instruction was executed
-3. SWI_exit (EFFFFFFF) : Stops the PC from incrementing, changes the state of the processor to Idle
+3. SWI_saveIns (EFC00001) : Saves the instruction stored in r0 to the instruction memory at the address stored in r1
+4. SWI_exit (EFFFFFFF) : Stops the PC from incrementing, changes the state of the processor to Idle
 
 All other SWI_instructions are SWI_go commands where the address in the instruction correponds to instructions in the OS file : 
 
